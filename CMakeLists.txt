@@ -39,6 +39,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
+find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(PCL 1.8 REQUIRED)
 
@@ -63,8 +64,8 @@ include_directories(src src/common src/contrib)
 include(FindPkgConfig)
 pkg_search_module(OPENCV opencv>=2.3)
 
-if(OPENCV_FOUND)
+# if(OPENCV_FOUND)
   include_directories(${OPENCV_INCLUDE_DIRS})
   add_subdirectory(src/opencv)
-endif(OPENCV_FOUND)
+# endif(OPENCV_FOUND)
 

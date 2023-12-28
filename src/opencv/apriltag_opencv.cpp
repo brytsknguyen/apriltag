@@ -128,12 +128,9 @@ void arrow(cv::Mat image,
   cv::Point c = scale_point(p1 - 4*d10 - 2*n, u, shift);
   cv::Point d = scale_point(p1 - 4*d10 + 2*n, u, shift);
 
-  cv::line(image, a, b, color, 1, CV_AA, shift);
-  cv::line(image, b, c, color, 1, CV_AA, shift);
-  cv::line(image, b, d, color, 1, CV_AA, shift);
-  
-  
-  
+  cv::line(image, a, b, color, 1, cv::LINE_AA, shift);
+  cv::line(image, b, c, color, 1, cv::LINE_AA, shift);
+  cv::line(image, b, d, color, 1, cv::LINE_AA, shift);  
 }
 
 void polylines(cv::Mat image,

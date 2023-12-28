@@ -49,7 +49,7 @@ void callback(const sensor_msgs::Image::ConstPtr& msg){
 
     zarray_t *detections = apriltag_detector_detect(td, im8);
 
-    printf("Detected %d tags.\n", zarray_size(detections));
+    // printf("Detected %d tags.\n", zarray_size(detections));
 
     // cv::Mat display = detectionsImage(detections, frame.size(), frame.type());
 
@@ -123,10 +123,10 @@ int main(int argc, char** argv) {
   //         0.0, -1.0, 0.0;
   // extrin_trans << 0.08, 0.0, -0.07;
 
-  extrin_rot << -0.00102555, -0.0105803, 0.999944,
-                -0.999976, -0.00692304, -0.00109884,
-                0.00693428, -0.99992, -0.0105728;
-  extrin_trans << 0.074361, -0.000497795, -0.0607882;
+  extrin_rot <<  -0.00102555, -0.01058030,   0.99994400,
+                 -0.99997600, -0.00692304,  -0.00109884,
+                  0.00693428, -0.99992000,  -0.01057280;
+  extrin_trans << 0.07436100, -0.000497795, -0.06078820;
 
   nh.param<double>("tag_size", tagsize, 0.096);
 
