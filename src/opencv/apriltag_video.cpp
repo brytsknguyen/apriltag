@@ -17,11 +17,13 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
-const double fx=279.3362, fy=281.7544, cx=331.7082, cy=242.6293, // Camera parameters
-         z_sign=1.0;//0.062
+using namespace std;
+using namespace Eigen;
+
 double tagsize;
-Eigen::Matrix3f extrin_rot;
-Eigen::Vector3f extrin_trans;
+double fx=279.3362, fy=281.7544, cx=331.7082, cy=242.6293, z_sign=1.0;  // Camera parameters
+Matrix3d extrin_rot;
+Vector3d extrin_trans;
 
 const char* MAT_FMT = "\t%12f, ";
 
@@ -75,20 +77,20 @@ void callback(const sensor_msgs::Image::ConstPtr& msg){
         matd_print(M, MAT_FMT);
 
         pcl::PointXYZINormal p;
-        Eigen::Vector3f trans_cam((M)->data[0*4+3], (M)->data[1*4+3], (M)->data[2*4+3]);
-        Eigen::Vector3f trans_lidar = extrin_rot * trans_cam + extrin_trans;
+        Eigen::Vector3d trans_cam((M)->data[0*4+3], (M)->data[1*4+3], (M)->data[2*4+3]);
+        Eigen::Vector3d trans_lidar = extrin_rot * trans_cam + extrin_trans;
         p.x = trans_lidar.x();
         p.y = trans_lidar.y();
         p.z = trans_lidar.z();
-        Eigen::Matrix3f rot;
+        Eigen::Matrix3d rot;
         rot << (M)->data[0*4+0], (M)->data[0*4+1], (M)->data[0*4+2],
-                (M)->data[1*4+0], (M)->data[1*4+1], (M)->data[1*4+2],
-                (M)->data[2*4+0], (M)->data[2*4+1], (M)->data[2*4+2];
+               (M)->data[1*4+0], (M)->data[1*4+1], (M)->data[1*4+2],
+               (M)->data[2*4+0], (M)->data[2*4+1], (M)->data[2*4+2];
         rot = extrin_rot * rot;
-        Eigen::AngleAxisf q(rot);
-        Eigen::Vector3f direction = q.axis();
+        Eigen::AngleAxisd q(rot);
+        Eigen::Vector3d direction = q.axis();
         float norm = q.angle();
-        Eigen::Vector3f rotation = direction * norm;
+        Eigen::Vector3d rotation = direction * norm;
         p.normal_x = rotation.x();
         p.normal_y = rotation.y();
         p.normal_z = rotation.z();
@@ -104,9 +106,8 @@ void callback(const sensor_msgs::Image::ConstPtr& msg){
       ros_cloud.header.stamp = msg->header.stamp;
       tag_cloud_pub.publish(ros_cloud);
     }
-    
 
-    printf("\n");
+    // printf("\n");
 
     apriltag_detections_destroy(detections);
 
@@ -115,23 +116,43 @@ void callback(const sensor_msgs::Image::ConstPtr& msg){
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "apriltag_video");
-  ros::NodeHandle nh;
-
-  // extrin_rot << 0.0, 0.0, 1.0,
-  //         -1.0, 0.0, 0.0,
-  //         0.0, -1.0, 0.0;
-  // extrin_trans << 0.08, 0.0, -0.07;
-
-  extrin_rot <<  -0.00102555, -0.01058030,   0.99994400,
-                 -0.99997600, -0.00692304,  -0.00109884,
-                  0.00693428, -0.99992000,  -0.01057280;
-  extrin_trans << 0.07436100, -0.000497795, -0.06078820;
-
-  nh.param<double>("tag_size", tagsize, 0.096);
-
-  ROS_INFO("tag_size = %f", tagsize);
   
+  ros::init(argc, argv, "apriltag_video");
+  ros::NodeHandle nh("~");
+
+  nh.getParam("tag_size", tagsize);
+  printf("tag_size = %f\n", tagsize);
+  
+  // Read the intrisics params
+  nh.getParam("fx",     fx    );
+  nh.getParam("fy",     fy    );
+  nh.getParam("cx",     cx    );
+  nh.getParam("cy",     cy    );
+  nh.getParam("z_sign", z_sign);
+
+  printf("fx:     %f\n", fx    );
+  printf("fy:     %f\n", fy    );
+  printf("cx:     %f\n", cx    );
+  printf("cy:     %f\n", cy    );
+  printf("z_sign: %f\n", z_sign);
+  
+  // Read the extrinsics
+  // extrin_rot <<  -0.00102555, -0.01058030,   0.99994400,
+  //                -0.99997600, -0.00692304,  -0.00109884,
+  //                 0.00693428, -0.99992000,  -0.01057280;
+  // extrin_trans << 0.07436100, -0.000497795, -0.06078820;
+
+  vector<double> extrin_rot_;
+  vector<double> extrin_trans_;
+  nh.getParam("extrin_rot",   extrin_rot_);
+  nh.getParam("extrin_trans", extrin_trans_);
+
+  extrin_rot = Eigen::Map<Matrix3d>(extrin_rot_.data()).transpose();
+  extrin_trans = Eigen::Map<Vector3d>(extrin_trans_.data());
+
+  std::cout << "extrin_rot:\n"   << extrin_rot << std::endl;
+  std::cout << "extrin_trans:\n" << extrin_trans << std::endl;
+
   getopt_t *getopt = getopt_create();
 
   getopt_add_bool(getopt, 'h', "help", 0, "Show this help");
