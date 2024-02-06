@@ -217,93 +217,12 @@ int main(int argc, char** argv) {
     }
   }
 
-    // cv::namedWindow(window);
-    // odo_pub = nh.advertise<nav_msgs::Odometry>("/tag_pose", 5);
-    // cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/scans", 5);
-
-
     tag_cloud_pub = nh.advertise<sensor_msgs::PointCloud2>("/tag_pose_cloud", 5);
 
     ros::Subscriber img_sub = nh.subscribe<sensor_msgs::Image>("/usb_cam/image_raw", 5, &callback);
     // ros::Subscriber cloud_sub = nh.subscribe<livox_ros_driver::CustomMsg>("/livox/lidar", 5, &livoxPointCloudCallback);
 
     ros::spin();
-//  cv::VideoCapture* cap;
-//
-//  if (movie_file) {
-//    cap = new cv::VideoCapture(movie_file);
-//  }
-//  else {
-//    cap = new cv::VideoCapture(camera_index);
-//  }
-
-  // const double fx=3156.71852, fy=3129.52243, cx=359.097908, cy=239.736909, // Camera parameters
-  //              tagsize=0.0762, z_sign=1.0;
-//  const double fx=279.3362, fy=281.7544, cx=331.7082, cy=242.6293, // Camera parameters
-//               tagsize=0.062, z_sign=1.0;
-//
-//  const char* MAT_FMT = "\t%12f, ";
-//
-//  const char* window = "AprilTag";
-//
-//  cv::Mat frame;
-//
-//  cv::namedWindow(window);
-
-//  while (1) {
-//    bool ok = cap->read(frame);
-//    if (!ok) { break; }
-//    cv::imshow(window, frame);
-//
-//    Mat8uc1 gray;
-//
-//    if (frame.channels() == 3) {
-//      cv::cvtColor(frame, gray, cv::COLOR_RGB2GRAY);
-//    }
-//    else {
-//      frame.copyTo(gray);
-//    }
-//
-//    image_u8_t* im8 = cv2im8_copy(gray);
-//
-//    zarray_t *detections = apriltag_detector_detect(td, im8);//! jin:已知图象中点和实际标定板中点的对应关系，可以计算H矩阵
-//
-//    printf("Detected %d tags.\n", zarray_size(detections));
-//
-//    cv::Mat display = detectionsImage(detections, frame.size(), frame.type());
-//
-//    for (int i = 0; i < zarray_size(detections); i++) {
-//      apriltag_detection_t *det;
-//      zarray_get(detections, i, &det);
-//
-//      matd_t* M = pose_from_homography(det->H, fx, fy, cx, cy,
-//                                       tagsize, z_sign, det->p, NULL, NULL);//! jin:已知H矩阵，可以计算出带尺度的Rt，已知码的实际大小，可以恢复出真实pose,tag码的中心，右手坐标系
-//
-//      printf("Detection %d of %d:\n \tFamily: tag%2dh%2d\n \tID: %d\n \tHamming: %d\n"
-//             "\tGoodness: %.3f\n \tMargin: %.3f\n \tCenter: (%.3f,%.3f)\n"
-//             "\tCorners: (%.3f,%.3f)\n\t\t (%.3f,%.3f)\n\t\t (%.3f,%.3f)\n\t\t (%.3f,%.3f)\n",
-//             i+1, zarray_size(detections), det->family->d*det->family->d, det->family->h,
-//             det->id, det->hamming, det->goodness, det->decision_margin, det->c[0], det->c[1],
-//             det->p[0][0], det->p[0][1], det->p[1][0], det->p[1][1], det->p[2][0], det->p[2][1],
-//             det->p[3][0], det->p[3][1]);
-//      printf("\tHomography:\n");
-//      matd_print(det->H, MAT_FMT);
-//      printf("\tPose:\n");
-//      matd_print(M, MAT_FMT);
-//    }
-//
-//    printf("\n");
-//
-//    apriltag_detections_destroy(detections);
-//
-//    display = 0.5*display + 0.5*frame;
-//    cv::imshow(window, display);
-//    image_u8_destroy(im8);
-//
-//    int k = cv::waitKey(1);
-//    if (k == 27) { break; }
-//
-//  }
 
   return 0;
 
